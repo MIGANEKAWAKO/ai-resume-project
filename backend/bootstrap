@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+export PYTHONPATH="/code/vendor:${PYTHONPATH}"
+
+mkdir -p "${UPLOAD_DIR:-/mnt/nas/uploads}"
+
+exec python3 -m uvicorn app.main:app \
+    --host 0.0.0.0 \
+    --port "${FC_SERVER_PORT:-9000}" \
+    --log-level info

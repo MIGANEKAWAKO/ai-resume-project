@@ -1,0 +1,54 @@
+name: Deploy Backend to Alibaba Cloud FC
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies into vendor/
+        run: |
+          mkdir -p vendor
+          pip install -r requirements.txt --target vendor --platform manylinux2014_x86_64 --only-binary=:all: 2>/dev/null || \
+          pip install -r requirements.txt --target vendor
+        env:
+          PIP_DISABLE_PIP_VERSION_CHECK: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Serverless Devs CLI
+        run: npm install -g @serverless-devs/s
+
+      - name: Configure Alibaba Cloud credentials
+        run: |
+          s config add \
+            --AccountID "${{ secrets.ALIBABA_ACCOUNT_ID }}" \
+            --AccessKeyID "${{ secrets.ALIBABA_ACCESS_KEY_ID }}" \
+            --AccessKeySecret "${{ secrets.ALIBABA_ACCESS_KEY_SECRET }}"
+
+      - name: Deploy to FC
+        run: s deploy --use-local -y
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          NAS_SERVER_ADDR: ${{ secrets.NAS_SERVER_ADDR }}
+
+      - name: Show deploy result
+        run: |
+          echo "Deploy completed."
+          echo "Health check: curl https://<your-fc-url>/api/health"

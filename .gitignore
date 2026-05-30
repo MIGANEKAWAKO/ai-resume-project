@@ -1,0 +1,23 @@
+# Secrets
+backend/.env
+.env
+
+# Python
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/resume.db
+backend/uploads/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Temp
+deploy-temp/

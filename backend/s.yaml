@@ -1,0 +1,37 @@
+edition: 3.0.0
+name: ai-resume-backend
+access: default
+
+resources:
+  ai-resume-fc:
+    component: fc3
+    props:
+      region: cn-hangzhou
+      functionName: ai-resume-api
+      runtime: custom.debian12
+      description: AI Resume Screening API
+      handler: bootstrap
+      code: ./
+      memorySize: 512
+      timeout: 120
+      instanceConcurrency: 1
+      environmentVariables:
+        DEEPSEEK_API_KEY: ${env(DEEPSEEK_API_KEY)}
+        DEEPSEEK_BASE_URL: https://api.deepseek.com
+        DEEPSEEK_MODEL: deepseek-chat
+        DATABASE_URL: sqlite+aiosqlite:////mnt/nas/resume.db
+        UPLOAD_DIR: /mnt/nas/uploads
+      nasConfig:
+        userId: 10003
+        groupId: 10003
+        mountPoints:
+          - serverAddr: ${env(NAS_SERVER_ADDR)}
+            nasDir: /
+            fcDir: /mnt/nas
+      triggers:
+        - triggerName: http
+          triggerType: http
+          triggerConfig:
+            methods: [GET, POST, PUT, DELETE, OPTIONS]
+            authType: anonymous
+            disableURLInternet: false
