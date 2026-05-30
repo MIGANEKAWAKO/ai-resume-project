@@ -62,7 +62,7 @@ export function ResumeDetailDialog({ resumeId, open, onClose }: Props) {
                 <div key={key}>
                   <div className="text-xs text-[var(--color-muted-foreground)]">{label}</div>
                   <div className="text-sm font-medium mt-0.5 break-all">
-                    {(data.parsed_info as Record<string, string>)[key] || "-"}
+                    {data.parsed_info[key as keyof typeof data.parsed_info] || "-"}
                   </div>
                 </div>
               ))}
